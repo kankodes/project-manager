@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Manager with Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div id="login-page" class="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
+  <form id="login-form" class="flex flex-col space-y-4">
+    <input type="email" id="email" placeholder="Email" class="border p-3 rounded-md" required>
+    <input type="password" id="password" placeholder="Password" class="border p-3 rounded-md" required>
+    <button type="submit" class="bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700">Login</button>
+  </form>
+</div>
+
+<div id="task-manager" class="hidden w-full max-w-2xl p-6">
+  <h1 class="text-3xl font-bold text-center mb-6">🗓️ My Task Manager</h1>
+
+  <form id="task-form" class="flex flex-col md:flex-row gap-4 mb-6">
+    <input type="text" id="task-name" placeholder="Task Name" class="flex-1 border p-3 rounded-md" required>
+    <input type="datetime-local" id="task-deadline" class="flex-1 border p-3 rounded-md" required>
+    <button type="submit" class="bg-green-600 text-white p-3 rounded-md hover:bg-green-700">Add Task</button>
+  </form>
+
+  <div id="task-list" class="space-y-4"></div>
+
+  <div class="text-center mt-6">
+    <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600">Logout</button>
+  </div>
+</div>
+
+<script>
+  // Hardcoded credentials
+  const validEmail = "admin@example.com";
+  const validPassword = "password123";
+
+  const loginPage = document.getElementById('login-page');
+  const taskManager = document.getElementById('task-manager');
+  const loginForm = document.getElementById('login-form');
+  const taskForm = document.getElementById('task-form');
+  const taskList = document.getElementById('task-list');
+
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+  function showTaskManager() {
+    loginPage.classList.add('hidden');
+    taskManager.classList.remove('hidden');
+    renderTasks();
+  }
+
+  function logout() {
+    localStorage.removeItem('loggedIn');
+    location.reload();
+  }
+
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (email === validEmail && password === validPassword) {
+      localStorage.setItem('loggedIn', 'true');
+      showTaskManager();
+    } else {
+      alert('Invalid credentials!');
+    }
+  });
+
+  function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+
+  function renderTasks() {
+    taskList.innerHTML = '';
+    tasks.forEach((task, index) => {
+      const taskCard = document.createElement('div');
+      taskCard.className = `p-4 rounded-md shadow-md ${task.completed ? 'bg-green-100' : 'bg-yellow-100'}`;
+      taskCard.innerHTML = `
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-xl font-semibold ${task.completed ? 'line-through text-gray-500' : ''}">${task.name}</h3>
+            <p class="text-sm text-gray-600">Deadline: ${new Date(task.deadline).toLocaleString()}</p>
+          </div>
+          <div class="flex space-x-2">
+            <button onclick="toggleTask(${index})" class="px-3 py-1 text-sm rounded-md ${task.completed ? 'bg-yellow-500' : 'bg-green-500'} text-white">
+              ${task.completed ? 'Mark Pending' : 'Mark Done'}
+            </button>
+            <button onclick="deleteTask(${index})" class="px-3 py-1 bg-red-500 text-white text-sm rounded-md">Delete</button>
+          </div>
+        </div>
+      `;
+      taskList.appendChild(taskCard);
+    });
+  }
+
+  function toggleTask(index) {
+    tasks[index].completed = !tasks[index].completed;
+    saveTasks();
+    renderTasks();
+  }
+
+  function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
+  }
+
+  taskForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const taskName = document.getElementById('task-name').value;
+    const taskDeadline = document.getElementById('task-deadline').value;
+
+    tasks.push({ name: taskName, deadline: taskDeadline, completed: false });
+    saveTasks();
+    renderTasks();
+    taskForm.reset();
+  });
+
+  // Auto-login if previously logged in
+  if (localStorage.getItem('loggedIn') === 'true') {
+    showTaskManager();
+  }
+</script>
+
+</body>
+</html>
