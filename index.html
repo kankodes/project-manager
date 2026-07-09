@@ -1,129 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Task Manager with Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garnet Events | Premium Event Design &amp; Production</title>
+<meta name="description" content="Garnet Events crafts extraordinary weddings, corporate galas, social celebrations and destination experiences with premium, bespoke design.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%232b0a12%22/><rect x=%2211%22 y=%228%22 width=%2210%22 height=%2210%22 fill=%22%23d4af6a%22 transform=%22rotate(45 16 16)%22/></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="pre-load">
 
-<div id="login-page" class="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-  <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
-  <form id="login-form" class="flex flex-col space-y-4">
-    <input type="email" id="email" placeholder="Email" class="border p-3 rounded-md" required>
-    <input type="password" id="password" placeholder="Password" class="border p-3 rounded-md" required>
-    <button type="submit" class="bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700">Login</button>
-  </form>
-</div>
+<div class="preloader"><div class="preloader__mark"><div class="preloader__gem"></div>Garnet Events</div></div>
 
-<div id="task-manager" class="hidden w-full max-w-2xl p-6">
-  <h1 class="text-3xl font-bold text-center mb-6">🗓️ My Task Manager</h1>
+<header class="nav">
+  <div class="container nav__inner">
+    <a href="index.html" class="nav__logo">
+      <span class="nav__logo-mark"></span>
+      <span class="nav__logo-text">Garnet <em>Events</em></span>
+    </a>
+    <nav class="nav__links">
+      <a href="index.html" class="is-active">Home</a>
+      <a href="about.html">About</a>
+      <a href="services.html">Services</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav__cta">
+      <a href="contact.html" class="btn btn--outline"><span>Plan Your Event</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <button class="nav__toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
 
-  <form id="task-form" class="flex flex-col md:flex-row gap-4 mb-6">
-    <input type="text" id="task-name" placeholder="Task Name" class="flex-1 border p-3 rounded-md" required>
-    <input type="datetime-local" id="task-deadline" class="flex-1 border p-3 rounded-md" required>
-    <button type="submit" class="bg-green-600 text-white p-3 rounded-md hover:bg-green-700">Add Task</button>
-  </form>
+<section class="hero">
+  <div class="hero__media">
+    <video autoplay muted loop playsinline poster="assets/img/hero-home-poster.jpg">
+      <source src="assets/videos/hero-home.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="hero__scrim"></div>
+  <div class="hero__particles"></div>
+  <div class="hero__content">
+    <p class="eyebrow">Premium Event Design &amp; Production</p>
+    <h1 class="hero__title">
+      <span><span class="line-inner">Where Every Occasion</span></span>
+      <span><span class="line-inner">Becomes <em>Extraordinary</em></span></span>
+    </h1>
+    <p class="hero__sub">Garnet Events designs and produces weddings, galas and celebrations with uncompromising craft — from the first sketch to the final toast.</p>
+    <div class="hero__actions">
+      <a href="contact.html" class="btn btn--gold"><span>Start Planning</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="gallery.html" class="btn btn--outline"><span>View Our Work</span></a>
+    </div>
+  </div>
+  <div class="hero__scroll">Scroll to explore</div>
+</section>
 
-  <div id="task-list" class="space-y-4"></div>
-
-  <div class="text-center mt-6">
-    <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600">Logout</button>
+<div class="marquee">
+  <div class="marquee__track">
+    <span>Weddings</span><span>Corporate Galas</span><span>Destination Events</span><span>Social Celebrations</span><span>Brand Launches</span><span>Exhibitions</span>
+    <span>Weddings</span><span>Corporate Galas</span><span>Destination Events</span><span>Social Celebrations</span><span>Brand Launches</span><span>Exhibitions</span>
   </div>
 </div>
 
-<script>
-  // Hardcoded credentials
-  const validEmail = "admin@example.com";
-  const validPassword = "password123";
+<section class="section">
+  <div class="container split">
+    <div class="split__media" data-reveal="left">
+      <img src="assets/img/gallery-01.jpg" alt="Elegant Garnet Events ballroom reception">
+      <div class="frame-tag"><strong data-count="12" data-suffix="+">0+</strong><span>Years of premium event craft</span></div>
+    </div>
+    <div data-reveal="right">
+      <p class="eyebrow">Who We Are</p>
+      <h2 style="font-size:clamp(34px,4.2vw,52px); margin-top:22px;">A decade of crafting moments that <em style="font-style:italic;color:var(--garnet-700);">linger long after the lights dim.</em></h2>
+      <p class="lede" style="margin-top:26px;">Garnet Events is a full-service event design and production house. We blend meticulous planning with atmospheric, sensory design — rich textures, warm light, and considered detail — to build experiences guests remember for years.</p>
+      <div class="pill-row">
+        <span class="pill">Bespoke Design</span>
+        <span class="pill">End-to-End Production</span>
+        <span class="pill">Destination Ready</span>
+      </div>
+      <a href="about.html" class="btn btn--outline-dark" style="margin-top:38px;"><span>Our Story</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
 
-  const loginPage = document.getElementById('login-page');
-  const taskManager = document.getElementById('task-manager');
-  const loginForm = document.getElementById('login-form');
-  const taskForm = document.getElementById('task-form');
-  const taskList = document.getElementById('task-list');
+<section class="section section--dark section--tight">
+  <div class="mesh"><span></span><span></span><span></span></div>
+  <div class="grain"></div>
+  <div class="container" style="position:relative; z-index:1; display:grid; grid-template-columns:repeat(4,1fr); gap:40px;">
+    <div class="stat" data-reveal="fade"><div class="stat__num"><span data-count="420" data-suffix="+">0</span></div><div class="stat__label">Events Delivered</div></div>
+    <div class="stat" data-reveal="fade" data-reveal-delay="1"><div class="stat__num"><span data-count="12" data-suffix="+">0</span></div><div class="stat__label">Years of Excellence</div></div>
+    <div class="stat" data-reveal="fade" data-reveal-delay="2"><div class="stat__num"><span data-count="98" data-suffix="%">0</span></div><div class="stat__label">Client Satisfaction</div></div>
+    <div class="stat" data-reveal="fade" data-reveal-delay="3"><div class="stat__num"><span data-count="30" data-suffix="+">0</span></div><div class="stat__label">Cities Covered</div></div>
+  </div>
+  <style>.section--tight .container{grid-template-columns:repeat(4,1fr)!important;}@media(max-width:760px){.section--tight .container{grid-template-columns:repeat(2,1fr)!important; row-gap:44px;}}</style>
+</section>
 
-  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+<section class="section">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px;" data-reveal="fade">
+      <div>
+        <p class="eyebrow">What We Do</p>
+        <h2 style="font-size:clamp(34px,4.2vw,52px); margin-top:22px; max-width:600px;">Services designed around your occasion</h2>
+      </div>
+      <a href="services.html" class="btn btn--outline-dark"><span>All Services</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
 
-  function showTaskManager() {
-    loginPage.classList.add('hidden');
-    taskManager.classList.remove('hidden');
-    renderTasks();
-  }
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:60px;" class="services-grid">
+      <a href="services.html#weddings" class="service-card tilt" data-reveal="scale">
+        <img src="assets/img/service-weddings.jpg" alt="Luxury wedding design">
+        <div class="service-card__scrim"></div>
+        <span class="service-card__num">01</span>
+        <div class="service-card__body">
+          <h3>Weddings</h3>
+          <p>Bespoke ceremony and reception design, from mandap to send-off.</p>
+          <span class="service-card__link">Discover →</span>
+        </div>
+      </a>
+      <a href="services.html#corporate" class="service-card tilt" data-reveal="scale" data-reveal-delay="1">
+        <img src="assets/img/service-corporate.jpg" alt="Corporate event production">
+        <div class="service-card__scrim"></div>
+        <span class="service-card__num">02</span>
+        <div class="service-card__body">
+          <h3>Corporate &amp; Galas</h3>
+          <p>Conferences, launches and galas engineered for impact.</p>
+          <span class="service-card__link">Discover →</span>
+        </div>
+      </a>
+      <a href="services.html#social" class="service-card tilt" data-reveal="scale" data-reveal-delay="2">
+        <img src="assets/img/service-social.jpg" alt="Private celebration styling">
+        <div class="service-card__scrim"></div>
+        <span class="service-card__num">03</span>
+        <div class="service-card__body">
+          <h3>Social Celebrations</h3>
+          <p>Milestone birthdays, anniversaries and intimate gatherings.</p>
+          <span class="service-card__link">Discover →</span>
+        </div>
+      </a>
+      <a href="services.html#destination" class="service-card tilt" data-reveal="scale" data-reveal-delay="3">
+        <img src="assets/img/gallery-06.jpg" alt="Destination event marquee">
+        <div class="service-card__scrim"></div>
+        <span class="service-card__num">04</span>
+        <div class="service-card__body">
+          <h3>Destination &amp; Exhibitions</h3>
+          <p>Scenic destination events and immersive brand exhibitions.</p>
+          <span class="service-card__link">Discover →</span>
+        </div>
+      </a>
+    </div>
+    <style>@media(max-width:940px){.services-grid{grid-template-columns:repeat(2,1fr)!important;}}@media(max-width:560px){.services-grid{grid-template-columns:1fr!important;}}</style>
+  </div>
+</section>
 
-  function logout() {
-    localStorage.removeItem('loggedIn');
-    location.reload();
-  }
+<section class="section section--panel">
+  <div class="container">
+    <p class="eyebrow">Recent Work</p>
+    <h2 style="font-size:clamp(34px,4.2vw,52px); margin-top:22px;" data-reveal="fade">A glimpse into our portfolio</h2>
+    <div class="masonry" style="margin-top:56px;">
+      <a href="gallery.html" class="masonry__item"><img src="assets/img/gallery-02.jpg" alt="Floral centerpiece detail"><span class="cap">Floral Artistry</span></a>
+      <a href="gallery.html" class="masonry__item"><img src="assets/img/gallery-03.jpg" alt="Wedding mandap stage"><span class="cap">Ceremony Design</span></a>
+      <a href="gallery.html" class="masonry__item"><img src="assets/img/gallery-05.jpg" alt="Corporate gala stage"><span class="cap">Corporate Production</span></a>
+      <a href="gallery.html" class="masonry__item"><img src="assets/img/gallery-08.jpg" alt="Dance floor celebration"><span class="cap">Live Celebration</span></a>
+      <a href="gallery.html" class="masonry__item"><img src="assets/img/gallery-04.jpg" alt="Elegant table setting"><span class="cap">Table Styling</span></a>
+      <a href="gallery.html" class="masonry__item"><img src="assets/img/gallery-07.jpg" alt="Dessert table styling"><span class="cap">Dessert Design</span></a>
+    </div>
+    <div style="text-align:center; margin-top:50px;" data-reveal="fade">
+      <a href="gallery.html" class="btn btn--outline-dark"><span>View Full Gallery</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
 
-  loginForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    if (email === validEmail && password === validPassword) {
-      localStorage.setItem('loggedIn', 'true');
-      showTaskManager();
-    } else {
-      alert('Invalid credentials!');
-    }
-  });
-
-  function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }
-
-  function renderTasks() {
-    taskList.innerHTML = '';
-    tasks.forEach((task, index) => {
-      const taskCard = document.createElement('div');
-      taskCard.className = `p-4 rounded-md shadow-md ${task.completed ? 'bg-green-100' : 'bg-yellow-100'}`;
-      taskCard.innerHTML = `
-        <div class="flex justify-between items-center">
-          <div>
-            <h3 class="text-xl font-semibold ${task.completed ? 'line-through text-gray-500' : ''}">${task.name}</h3>
-            <p class="text-sm text-gray-600">Deadline: ${new Date(task.deadline).toLocaleString()}</p>
-          </div>
-          <div class="flex space-x-2">
-            <button onclick="toggleTask(${index})" class="px-3 py-1 text-sm rounded-md ${task.completed ? 'bg-yellow-500' : 'bg-green-500'} text-white">
-              ${task.completed ? 'Mark Pending' : 'Mark Done'}
-            </button>
-            <button onclick="deleteTask(${index})" class="px-3 py-1 bg-red-500 text-white text-sm rounded-md">Delete</button>
+<section class="section">
+  <div class="container" style="max-width:820px;">
+    <p class="eyebrow" style="justify-content:center; display:flex;">Kind Words</p>
+    <h2 style="font-size:clamp(32px,4vw,46px); margin-top:22px; text-align:center;" data-reveal="fade">Loved by the clients we celebrate with</h2>
+    <div class="testi-wrap" style="margin-top:56px;" data-reveal="fade">
+      <div class="testi-track">
+        <div class="testi-slide">
+          <div class="testi"><span class="testi__mark">“</span>
+            <p class="testi__quote">Garnet Events transformed our wedding into something out of a dream. Every gold thread and candle flicker felt intentional.</p>
+            <div class="testi__person"><div class="testi__avatar">AS</div><div><div class="testi__name">Aanya &amp; Samir</div><div class="testi__role">Wedding Clients</div></div></div>
           </div>
         </div>
-      `;
-      taskList.appendChild(taskCard);
-    });
-  }
+        <div class="testi-slide">
+          <div class="testi"><span class="testi__mark">“</span>
+            <p class="testi__quote">Our annual gala has never looked this polished. The team handled every production detail flawlessly, on a tight timeline.</p>
+            <div class="testi__person"><div class="testi__avatar">RK</div><div><div class="testi__name">Rhea Kapoor</div><div class="testi__role">Head of Marketing, Lumen Corp</div></div></div>
+          </div>
+        </div>
+        <div class="testi-slide">
+          <div class="testi"><span class="testi__mark">“</span>
+            <p class="testi__quote">From the first call to the final send-off, Garnet Events felt like family — meticulous, warm, and endlessly creative.</p>
+            <div class="testi__person"><div class="testi__avatar">MV</div><div><div class="testi__name">Meera Varma</div><div class="testi__role">50th Anniversary Celebration</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-nav"></div>
+    </div>
+  </div>
+</section>
 
-  function toggleTask(index) {
-    tasks[index].completed = !tasks[index].completed;
-    saveTasks();
-    renderTasks();
-  }
+<section class="section cta-band">
+  <div class="mesh"><span></span><span></span><span></span></div>
+  <div class="grain"></div>
+  <div class="container" style="position:relative; z-index:1;" data-reveal="scale">
+    <p class="eyebrow" style="justify-content:center; display:flex;">Let's Talk</p>
+    <h2 style="margin-top:24px;">Ready to create something<br><em style="font-style:italic; color:var(--gold-300);">extraordinary?</em></h2>
+    <p class="cta-band__sub">Tell us about your occasion and our design team will craft a proposal within 48 hours.</p>
+    <a href="contact.html" class="btn btn--gold"><span>Begin Your Event</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
 
-  function deleteTask(index) {
-    tasks.splice(index, 1);
-    saveTasks();
-    renderTasks();
-  }
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="index.html" class="nav__logo"><span class="nav__logo-mark"></span><span class="nav__logo-text">Garnet <em>Events</em></span></a>
+        <p>Premium event design and production for weddings, corporate galas, social celebrations and destination experiences.</p>
+        <div class="footer__social">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="Pinterest">PI</a>
+          <a href="#" aria-label="Facebook">FB</a>
+        </div>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="services.html#weddings">Weddings</a></li>
+          <li><a href="services.html#corporate">Corporate &amp; Galas</a></li>
+          <li><a href="services.html#social">Social Celebrations</a></li>
+          <li><a href="services.html#destination">Destination &amp; Exhibitions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Stay Inspired</h4>
+        <p>Join our list for event design ideas and studio news.</p>
+        <form class="newsletter">
+          <input type="email" placeholder="Your email address" required>
+          <button type="submit" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© <span id="year"></span> Garnet Events. All rights reserved.</span>
+      <span>Crafted with care for unforgettable occasions.</span>
+    </div>
+  </div>
+</footer>
 
-  taskForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const taskName = document.getElementById('task-name').value;
-    const taskDeadline = document.getElementById('task-deadline').value;
+<div class="lightbox">
+  <button class="lightbox__close" aria-label="Close">✕</button>
+  <button class="lightbox__nav lightbox__nav--prev" aria-label="Previous">←</button>
+  <img src="" alt="Gallery preview">
+  <button class="lightbox__nav lightbox__nav--next" aria-label="Next">→</button>
+</div>
 
-    tasks.push({ name: taskName, deadline: taskDeadline, completed: false });
-    saveTasks();
-    renderTasks();
-    taskForm.reset();
-  });
+<button class="back-to-top" aria-label="Back to top">↑</button>
 
-  // Auto-login if previously logged in
-  if (localStorage.getItem('loggedIn') === 'true') {
-    showTaskManager();
-  }
-</script>
-
+<script src="assets/js/main.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
