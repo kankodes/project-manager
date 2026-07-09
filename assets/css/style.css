@@ -206,20 +206,13 @@ body.no-hover .cursor-dot, body.no-hover .cursor-ring { display: none; }
 }
 .preloader.is-done { opacity: 0; visibility: hidden; }
 .preloader__mark {
-  font-family: var(--font-display);
-  font-size: 15px;
-  letter-spacing: 0.5em;
-  color: var(--gold-300);
-  text-transform: uppercase;
   display: flex; flex-direction: column; align-items: center; gap: 22px;
 }
-.preloader__gem {
-  width: 26px; height: 26px;
-  background: linear-gradient(135deg, var(--gold-300), var(--garnet-500));
-  transform: rotate(45deg);
-  animation: gem-pulse 1.4s ease-in-out infinite;
+.preloader__logo {
+  height: 110px; width: auto; display: block;
+  animation: logo-pulse 1.6s ease-in-out infinite;
 }
-@keyframes gem-pulse { 0%, 100% { transform: rotate(45deg) scale(1); opacity: 1; } 50% { transform: rotate(45deg) scale(0.72); opacity: 0.6; } }
+@keyframes logo-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.55; transform: scale(0.94); } }
 
 /* ---------- Nav ---------- */
 .nav {
