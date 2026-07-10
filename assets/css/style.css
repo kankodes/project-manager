@@ -529,3 +529,40 @@ body.pre-load * { transition: none !important; animation-play-state: paused !imp
   .section { padding: 90px 0; }
   body { font-size: 18px; }
 }
+
+/* ---------- Founder section ---------- */
+.founder-media { position: relative; border-radius: 6px; overflow: hidden; }
+.founder-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.founder-media::after { content: ''; position: absolute; inset: 14px; border: 1px solid rgba(212,175,106,0.45); pointer-events: none; }
+.founder-sign { font-family: var(--font-display); font-style: italic; color: var(--gold-600); font-size: 20px; margin-top: 26px; }
+
+/* ---------- Credits / featured productions strip ---------- */
+.credits { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 26px; margin-top: 50px; }
+.credits__item {
+  background: var(--ivory); border: 1px solid rgba(122,26,48,0.12); border-radius: 12px;
+  padding: 18px 26px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 20px 40px -30px rgba(26,5,9,0.4);
+  transition: transform 0.5s var(--ease-premium), box-shadow 0.5s var(--ease-premium);
+}
+.credits__item:hover { transform: translateY(-6px); box-shadow: 0 28px 50px -28px rgba(26,5,9,0.5); }
+.credits__item img { height: 62px; width: auto; display: block; }
+@media (max-width: 640px) { .credits__item img { height: 48px; } .credits { gap: 16px; } }
+
+/* ---------- WhatsApp floating button ---------- */
+.wa-float {
+  position: fixed; right: 28px; bottom: 88px; z-index: 600;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: #25D366; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 12px 30px -8px rgba(37,211,102,0.6);
+  transition: transform 0.4s var(--ease-premium), box-shadow 0.4s var(--ease-premium);
+}
+.wa-float:hover { transform: scale(1.08) translateY(-2px); box-shadow: 0 18px 38px -8px rgba(37,211,102,0.75); }
+.wa-float svg { width: 32px; height: 32px; }
+.wa-float::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: #25D366; opacity: 0.55; z-index: -1;
+  animation: wa-pulse 2.2s ease-out infinite;
+}
+@keyframes wa-pulse { 0% { transform: scale(1); opacity: 0.55; } 70%, 100% { transform: scale(1.7); opacity: 0; } }
+@media (max-width: 640px) { .wa-float { width: 52px; height: 52px; right: 20px; bottom: 82px; } .wa-float svg { width: 28px; height: 28px; } }
