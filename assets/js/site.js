@@ -57,9 +57,9 @@
     }
   }
 
-  /* Hero video: small file on phones, large on wide screens; no autoplay for reduced motion or data saver */
+  /* Hero video: portrait cut for upright phones, 16:9 for anything wide; no autoplay for reduced motion or data saver */
   document.querySelectorAll("video[data-src-lg]").forEach(function (video) {
-    var wide = window.matchMedia("(min-width: 900px)").matches;
+    var wide = window.matchMedia("(min-width: 900px), (min-aspect-ratio: 1/1)").matches;
     var btn = video.closest(".hero").querySelector(".media-toggle");
     if (wide && video.dataset.posterLg) video.poster = video.dataset.posterLg;
     if (reduceMotion || saveData) {

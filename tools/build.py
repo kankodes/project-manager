@@ -31,14 +31,10 @@ NAV = [
 ]
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 
-# width x height of the largest WebP for each image (the smaller one is always 800w)
-IMAGES = {
-    "gallery-01": (1400, 1810), "gallery-02": (1400, 1810), "gallery-03": (1400, 1810),
-    "gallery-04": (1400, 1810), "gallery-05": (1400, 1810), "gallery-06": (1400, 1810),
-    "gallery-07": (1400, 1810), "gallery-08": (1400, 1810),
-    "service-social": (1400, 1048), "service-destination": (1400, 1048),
-    "founder-amit": (987, 1200),
-}
+# Event photos and hero posters come from tools/media.py, which records each
+# image's largest size and the widths it was encoded at (AVIF + WebP).
+IMAGES = json.loads((ROOT / "tools/media.json").read_text())
+IMAGES["founder-amit"] = {"w": 987, "h": 1200, "widths": [800, 987], "avif": False}
 
 
 def asset_version(rel):
@@ -54,31 +50,41 @@ PAUSE = '<svg class="icon-pause" viewBox="0 0 16 16" aria-hidden="true"><path d=
 PLAY = '<svg class="icon-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg>'
 
 
-def img(name, alt, sizes, eager=False, cls="", parallax=False):
-    w, h = IMAGES[name]
+def srcset(name, ext):
+    return ", ".join(f"assets/img/{name}-{w}.{ext} {w}w" for w in IMAGES[name]["widths"])
+
+
+def full_size(name):
+    """The file the gallery lightbox opens: the largest width up to 1600."""
+    return f"assets/img/{name}-{max(w for w in IMAGES[name]['widths'] if w <= 1600)}.webp"
+
+
+def img(name, alt, sizes, eager=False, cls="", parallax=False, pos=None):
+    m = IMAGES[name]
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
     c = f' class="{cls}"' if cls else ""
     p = " data-parallax" if parallax else ""
-    return (f'<img{c} src="assets/img/{name}-800.webp" '
-            f'srcset="assets/img/{name}-800.webp 800w, assets/img/{name}-{w}.webp {w}w" '
-            f'sizes="{sizes}" width="{w}" height="{h}" alt="{escape(alt)}" {load} decoding="async"{p}>')
+    s = f' style="object-position:{pos}"' if pos else ""
+    fallback = m["widths"][min(1, len(m["widths"]) - 1)]
+    tag = (f'<img{c} src="assets/img/{name}-{fallback}.webp" srcset="{srcset(name, "webp")}" '
+           f'sizes="{sizes}" width="{m["w"]}" height="{m["h"]}" alt="{escape(alt)}" {load} decoding="async"{p}{s}>')
+    if not m.get("avif", True):
+        return tag
+    return f'<picture><source type="image/avif" srcset="{srcset(name, "avif")}" sizes="{sizes}">{tag}</picture>'
 
 
-def poster(page, alt, sizes, parallax=False):
-    """A hero video's still frame, reused as a landscape photograph."""
-    p = " data-parallax" if parallax else ""
-    return (f'<img src="assets/img/hero-{page}-poster-960.webp" '
-            f'srcset="assets/img/hero-{page}-poster-960.webp 960w, assets/img/hero-{page}-poster-1920.webp 1920w" '
-            f'sizes="{sizes}" width="1920" height="1080" alt="{escape(alt)}" loading="lazy" decoding="async"{p}>')
+# Phones held upright get the portrait-cropped hero; anything wide or landscape gets 16:9.
+WIDE_MQ = "(min-width: 900px), (min-aspect-ratio: 1/1)"
+TALL_MQ = "(max-width: 899px) and (max-aspect-ratio: 1/1)"
 
 
 def hero_video(page):
     return f'''<div class="hero__media">
     <video muted loop playsinline preload="none" aria-hidden="true"
-      poster="assets/img/hero-{page}-poster-960.webp"
-      data-poster-lg="assets/img/hero-{page}-poster-1920.webp"
-      data-src-sm="assets/videos/hero-{page}-sm.mp4"
-      data-src-lg="assets/videos/hero-{page}.mp4"></video>
+      poster="assets/img/{page}-hero-sm.webp"
+      data-poster-lg="assets/img/{page}-hero-1920.webp"
+      data-src-sm="assets/videos/{page}-hero-sm.mp4"
+      data-src-lg="assets/videos/{page}-hero.mp4"></video>
   </div>
   <div class="hero__frame" aria-hidden="true"></div>
   <button class="media-toggle" type="button" aria-pressed="false" aria-label="Pause background video">{PAUSE}{PLAY}</button>'''
@@ -100,23 +106,23 @@ def inner_hero(page, eyebrow, caps, script, lead):
 
 
 SERVICES = [
-    ("योजना", "Event planning", "from concept to execution", "gallery-04", "Place setting with gold charger and garnet napkin",
+    ("योजना", "Event planning", "from concept to execution", "tile-backdrop", "Blue-tile photo backdrop with a yellow scooter and sunflowers, set up on a hotel rooftop",
      "One plan, one budget and one timeline that everyone works from."),
-    ("रचना", "Event design", "built around your vision", "gallery-03", "Velvet-draped wedding mandap with gold columns and floral urns",
+    ("रचना", "Event design", "built around your vision", "blue-florals", "Ballroom ceiling hung with white flowers under blue light, around a glowing light-sculpture tree",
      "Theme, colour, layout and mood, designed as one look."),
-    ("स्थल", "Venue selection", "the right room, the right city", "gallery-01", "Ballroom wedding reception with tall floral centrepieces",
+    ("स्थल", "Venue selection", "the right room, the right city", "palace-stage", "Palace-facade stage built on an open lawn and lit for an evening wedding",
      "We shortlist, visit and negotiate, so you only see the good ones."),
-    ("समन्वय", "Vendor coordination", "one team, every vendor", "gallery-07", "Tiered garnet cake on a styled dessert table",
+    ("समन्वय", "Vendor coordination", "one team, every vendor", "haldi-canopy", "Lilac and marigold haldi canopy with swings and potted flowers on a rooftop deck",
      "Caterers, florists, decorators and artists, briefed and held to the plan."),
-    ("सज्जा", "Décor & styling", "the atmosphere", "gallery-02", "Garnet rose beside gold filigree candle holders",
+    ("सज्जा", "Décor & styling", "the atmosphere", "birthday-florals", "Ceiling of pink and peach roses above a children's birthday set",
      "Flowers, fabric, light and tablescapes that look as good in person as in photographs."),
-    ("संचालन", "On-site management", "so the day runs to plan", "gallery-06", "Outdoor marquee dinner lit by lanterns and string lights",
+    ("संचालन", "On-site management", "so the day runs to plan", "box-office", "Box office and guest-list counters at the entrance of an outdoor brand event",
      "Our team runs the floor, the timings and the surprises."),
-    ("व्यवस्था", "Logistics", "the unglamorous part, done well", "service-destination", "Marquee reception at sunset with chandeliers and draped velvet",
+    ("व्यवस्था", "Logistics", "the unglamorous part, done well", "brand-gate", "Branded entry arch with queue barriers leading into an outdoor event ground",
      "Guest movement, transport, schedules and contingencies."),
-    ("ध्वनि · प्रकाश", "Sound & light", "audio-visual production", "gallery-05", "Corporate gala stage with a red backdrop and gold-lit runway",
+    ("ध्वनि · प्रकाश", "Sound & light", "audio-visual production", "stage-haze", "Moving-head beams and low fog across a wedding stage during a performance",
      "Stage, sound, lighting and screens for performances and presentations."),
-    ("मनोरंजन", "Entertainment", "artists and performers", "gallery-08", "Guests dancing under falling gold confetti",
+    ("मनोरंजन", "Entertainment", "artists and performers", "krishna-leela", "Performers dressed as Radha and Krishna in front of a floral stage",
      "Singers, DJs, dancers and anchors, booked and cued."),
 ]
 CARD_TONES = ["sage", "garnet", "sage", "black"]
@@ -216,7 +222,7 @@ def cities_block():
 
 def cta():
     return f'''<section class="cta" aria-labelledby="cta-title">
-  <div class="cta__bg" aria-hidden="true">{poster("contact", "", "100vw", parallax=True)}</div>
+  <div class="cta__bg" aria-hidden="true">{img("led-stage", "", "100vw", parallax=True)}</div>
   <div class="wrap">
     <p class="eyebrow" data-reveal>[ Enquiries ]</p>
     <h2 id="cta-title" class="cta__title" data-reveal style="--d:1">
@@ -245,8 +251,8 @@ def page(slug, title, description, body, preload_poster=None, jsonld=None, noind
         for i, (href, label) in enumerate(NAV))
     ld = f'\n<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>' if jsonld else ""
     robots = '\n<meta name="robots" content="noindex">' if noindex else ""
-    preload = (f'\n<link rel="preload" as="image" href="assets/img/hero-{preload_poster}-poster-960.webp" media="(max-width: 899px)">'
-               f'\n<link rel="preload" as="image" href="assets/img/hero-{preload_poster}-poster-1920.webp" media="(min-width: 900px)">'
+    preload = (f'\n<link rel="preload" as="image" href="assets/img/{preload_poster}-hero-sm.webp" media="{TALL_MQ}">'
+               f'\n<link rel="preload" as="image" href="assets/img/{preload_poster}-hero-1920.webp" media="{WIDE_MQ}">'
                if preload_poster else "")
     full_title = title if slug == "index" else f"{title} | Garnet Events & Production"
     header_cls = "site-header" if preload_poster else "site-header is-solid"
@@ -357,13 +363,13 @@ def page(slug, title, description, body, preload_poster=None, jsonld=None, noind
 
 def home():
     tiles = [
-        ("weddings", "Weddings", "gallery-03", "Velvet-draped wedding mandap with gold columns and floral urns", True,
+        ("weddings", "Weddings", "wedding-stage", "Wedding stage framed by florals and an LED backdrop, with a rose-petal aisle in front", True,
          "The experience", "Ceremony and reception design, multi-day functions, and the planning that holds them together."),
-        ("corporate", "Corporate", "gallery-05", "Corporate gala stage with a red backdrop and gold-lit runway", False,
+        ("corporate", "Corporate", "vip-bar", "VIP bar tents and a sponsor-branded counter at an outdoor brand event", False,
          "", "Conferences, launches, annual days and award nights, produced like a show."),
-        ("social", "Celebrations", "service-social", "Birthday table styled with garnet and gold balloons, roses and candles", False,
+        ("social", "Celebrations", "birthday-florals", "Ceiling of pink and peach roses above a children's birthday set", False,
          "", "Birthdays, anniversaries and family gatherings, styled with the care of a wedding."),
-        ("destination", "Destination", "service-destination", "Marquee reception at sunset with chandeliers and draped velvet", True,
+        ("destination", "Destination", "palace-stage", "Palace-facade stage built on an open lawn and lit for an evening wedding", True,
          "Away from home", "Celebrations in another city, with venues, vendors and logistics sorted on the ground."),
     ]
     tile_html = "\n".join(
@@ -373,12 +379,12 @@ def home():
         <span class="tile__body">{f'<span class="eyebrow">{k}</span>' if k else ''}<p>{d}</p><span class="link-line">Explore {ARROW}</span></span>
       </a>''' for n, (a, t, i, alt, wide, k, d) in enumerate(tiles, 1))
     work = [
-        ("gallery-01", "Ballroom wedding reception with tall floral centrepieces", "Reception, ballroom"),
-        ("gallery-08", "Guests dancing under falling gold confetti", "Gala night"),
-        ("gallery-07", "Tiered garnet cake on a styled dessert table", "Dessert table"),
-        ("gallery-02", "Garnet rose beside gold filigree candle holders", "Table details"),
-        ("gallery-06", "Outdoor marquee dinner lit by lanterns and string lights", "Marquee dinner"),
-        ("gallery-04", "Place setting with gold charger and garnet napkin", "Place setting"),
+        ("peacock-entry", "Bride and groom entering past giant peacock-feather installations", "Peacock entry"),
+        ("poolside-haldi", "Haldi stage in lilac and marigold beside a rooftop pool", "Poolside haldi"),
+        ("led-stage", "Sangeet performance on a stage wrapped in LED mandala screens", "Sangeet stage"),
+        ("wedding-stage-tall", "Wedding stage under a floral chandelier, with mirrored panels and a white aisle", "Wedding stage"),
+        ("haldi-canopy", "Lilac and marigold haldi canopy with swings and potted flowers on a rooftop deck", "Haldi canopy"),
+        ("blue-florals", "Ballroom ceiling hung with white flowers under blue light", "Floral ceiling"),
     ]
     work_items = "\n".join(
         f'        <div class="rail__item"><figure>{img(n, alt, "(min-width: 1100px) 33vw, (min-width: 700px) 46vw, 82vw")}<figcaption>{cap}</figcaption></figure></div>'
@@ -411,7 +417,7 @@ def home():
     </div>
     <div class="statement__row">
       <p class="eyebrow" data-reveal>About us</p>
-      <div class="statement__img" data-reveal="mask">{poster("gallery", "Garnet rose petals by candlelight", "(min-width: 900px) 40vw, 100vw", parallax=True)}</div>
+      <div class="statement__img" data-reveal="mask">{img("stage-haze", "Moving-head beams and low fog across a wedding stage during a performance", "(min-width: 900px) 40vw, 100vw", parallax=True)}</div>
       <div class="statement__text" data-reveal style="--d:2">
         <p><strong>Garnet Events &amp; Production</strong> is a hands-on studio founded by Amit Agarwal. We plan, design and run weddings, corporate events and private celebrations, from the first idea to the last guest home.</p>
         <p>We don't believe in templates. We believe in detail, in calm on the day, and in décor that looks as good in person as it does in photographs.</p>
@@ -572,19 +578,19 @@ def about():
 
 def services():
     rows = [
-        ("weddings", "Weddings", "Weddings &amp; functions", "gallery-03", "Velvet-draped wedding mandap with gold columns and floral urns",
+        ("weddings", "Weddings", "Weddings &amp; functions", "wedding-stage-tall", "Wedding stage under a floral chandelier, with mirrored panels and a white aisle",
          "From one ceremony to a week of functions, we design the look, book the right people and run the schedule, so your family can be part of the day instead of managing it.",
          "We start with how you want the day to feel, then build every function around it: the mandap, the stage, the flowers, the light and the timings. One team carries it from the first site visit to the last guest leaving.",
          ["Mandap, stage and décor design", "Haldi, mehendi, sangeet and reception", "Vendor booking and coordination", "On-the-day management, start to finish"]),
-        ("corporate", "Corporate", "Corporate events", "gallery-05", "Corporate gala stage with a red backdrop and gold-lit runway",
+        ("corporate", "Corporate", "Corporate events", "brand-gate", "Branded entry arch with queue barriers leading into an outdoor event ground",
          "Conferences, product launches, annual days and award nights, produced with the polish of a show and the discipline of a schedule.",
          "Our founder learned the trade on televised productions, so we think in cues, run-sheets and rehearsals. Your brand looks right on stage and your guests are looked after off it.",
          ["Stage, set and branding", "Sound, light and AV production", "Run-of-show and cue management", "Guest arrival and logistics"]),
-        ("social", "Social", "Social celebrations", "service-social", "Birthday table styled with garnet and gold balloons, roses and candles",
+        ("social", "Social", "Social celebrations", "led-stage", "Sangeet performance on a stage wrapped in LED mandala screens",
          "Birthdays, anniversaries, baby showers and family get-togethers, styled with the same care we bring to a wedding.",
          "Smaller gatherings deserve the same thought. We can take on the whole event or simply style the room, set the table and bring in the entertainment.",
          ["Theme, décor and table styling", "Entertainment and performers", "Venue search, if you need one", "Full planning or styling only"]),
-        ("destination", "Destination", "Destination events", "service-destination", "Marquee reception at sunset with chandeliers and draped velvet",
+        ("destination", "Destination", "Destination events", "palace-stage", "Palace-facade stage built on an open lawn and lit for an evening wedding",
          "Celebrations in another city: we scout the venue, line up local vendors and manage the logistics, so the move doesn't become your problem.",
          "We have worked across eight cities, from Kolkata and Guwahati to Jaipur, Hyderabad and Dubai. We know how to get people, décor and equipment where they need to be.",
          ["Venue scouting", "Local vendors and on-ground team", "Scheduling and logistics planning", "Experience across eight cities, including Dubai"]),
@@ -649,20 +655,22 @@ def services():
 
 def gallery():
     items = [
-        ("gallery-01", "weddings", "Ballroom wedding reception with tall floral centrepieces", "Ballroom reception"),
-        ("gallery-03", "weddings", "Velvet-draped wedding mandap with gold columns and floral urns", "Mandap design"),
-        ("gallery-05", "corporate", "Corporate gala stage with a red backdrop and gold-lit runway", "Gala stage"),
-        ("service-social", "social", "Birthday table styled with garnet and gold balloons, roses and candles", "Birthday styling"),
-        ("gallery-02", "weddings", "Garnet rose beside gold filigree candle holders", "Table details"),
-        ("gallery-06", "destination", "Outdoor marquee dinner lit by lanterns and string lights", "Marquee dinner"),
-        ("gallery-08", "corporate", "Guests dancing under falling gold confetti", "Gala night"),
-        ("gallery-07", "social", "Tiered garnet cake on a styled dessert table", "Dessert table"),
-        ("service-destination", "destination", "Marquee reception at sunset with chandeliers and draped velvet", "Sunset marquee"),
-        ("gallery-04", "social", "Place setting with gold charger and garnet napkin", "Place setting"),
+        ("wedding-stage", "weddings", "Wedding stage framed by florals and an LED backdrop, with a rose-petal aisle in front", "Wedding stage"),
+        ("peacock-entry", "weddings", "Bride and groom entering past giant peacock-feather installations", "Peacock entry"),
+        ("vip-bar", "corporate", "VIP bar tents and a sponsor-branded counter at an outdoor brand event", "VIP bar"),
+        ("birthday-florals", "social", "Ceiling of pink and peach roses above a children's birthday set", "Birthday florals"),
+        ("palace-stage", "destination", "Palace-facade stage built on an open lawn and lit for an evening wedding", "Palace stage"),
+        ("wedding-stage-tall", "weddings", "Wedding stage under a floral chandelier, with mirrored panels and a white aisle", "Floral chandelier"),
+        ("poolside-haldi", "social", "Haldi stage in lilac and marigold beside a rooftop pool", "Poolside haldi"),
+        ("box-office", "corporate", "Box office and guest-list counters at the entrance of an outdoor brand event", "Box office"),
+        ("stage-haze", "weddings", "Moving-head beams and low fog across a wedding stage during a performance", "Stage lighting"),
+        ("krishna-leela", "social", "Performers dressed as Radha and Krishna in front of a floral stage", "Radha Krishna act"),
+        ("brand-gate", "corporate", "Branded entry arch with queue barriers leading into an outdoor event ground", "Entry arch"),
+        ("tile-backdrop", "social", "Blue-tile photo backdrop with a yellow scooter and sunflowers, set up on a hotel rooftop", "Photo backdrop"),
     ]
     figs = "\n".join(
         f'''      <figure class="gallery__item" data-cat="{cat}" data-reveal style="--d:{n % 3}">
-        <button class="gallery__btn" type="button" aria-label="Open image: {escape(cap)}">{img(nm, alt, "(min-width: 900px) 33vw, 50vw").replace("<img ", f'<img data-full="assets/img/{nm}-{IMAGES[nm][0]}.webp" ', 1)}</button>
+        <button class="gallery__btn" type="button" aria-label="Open image: {escape(cap)}">{img(nm, alt, "(min-width: 900px) 33vw, 50vw").replace("<img ", f'<img data-full="{full_size(nm)}" ', 1)}</button>
         <figcaption>{cap}</figcaption>
       </figure>''' for n, (nm, cat, alt, cap) in enumerate(items))
     chips = [("all", "All"), ("weddings", "Weddings"), ("corporate", "Corporate"), ("social", "Social"), ("destination", "Destination")]
