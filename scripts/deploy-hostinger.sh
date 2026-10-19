@@ -32,6 +32,9 @@ mkdir -p "$REMOTE_DIR"
 mirror --reverse --delete --verbose \
   --exclude-glob ".git/" \
   --exclude-glob "scripts/" \
+  --exclude-glob "tools/" \
+  --exclude-glob ".claude/" \
+  --exclude-glob ".gitignore" \
   --exclude-glob "*.md" \
   "$LOCAL_DIR" "$REMOTE_DIR"
 bye
