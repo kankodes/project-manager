@@ -216,6 +216,21 @@
     box.querySelector("[data-q-next]").addEventListener("click", function () { go(i + 1); });
   });
 
+  /* In-page clips: load and play only while on screen; poster only for reduced motion or data saver */
+  var clips = document.querySelectorAll("video[data-inview-src]");
+  if (clips.length && !reduceMotion && !saveData && "IntersectionObserver" in window) {
+    var clipIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var v = entry.target;
+        if (entry.isIntersecting) {
+          if (!v.src) v.src = v.dataset.inviewSrc;
+          var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+        } else if (!v.paused) v.pause();
+      });
+    }, { threshold: .25 });
+    clips.forEach(function (v) { clipIo.observe(v); });
+  }
+
   /* Services tabs (all panels stay visible without JS) */
   document.querySelectorAll("[data-tabs]").forEach(function (box) {
     var tabs = Array.prototype.slice.call(box.querySelectorAll("[role=tab]"));

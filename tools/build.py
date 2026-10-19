@@ -90,9 +90,11 @@ def hero_video(page):
   <button class="media-toggle" type="button" aria-pressed="false" aria-label="Pause background video">{PAUSE}{PLAY}</button>'''
 
 
-def inner_hero(page, eyebrow, caps, script, lead):
-    return f'''<section class="hero hero--inner" aria-labelledby="page-title">
-  {hero_video(page)}
+def inner_hero(page, eyebrow, caps, script, lead, video=True):
+    media = hero_video(page) if video else '<div class="hero__frame" aria-hidden="true"></div>'
+    plain = "" if video else " hero--plain texture"
+    return f'''<section class="hero hero--inner{plain}" aria-labelledby="page-title">
+  {media}
   <div class="wrap hero__content">
     <div class="hero__row">
       <div>
@@ -106,19 +108,19 @@ def inner_hero(page, eyebrow, caps, script, lead):
 
 
 SERVICES = [
-    ("योजना", "Event planning", "from concept to execution", "tile-backdrop", "Blue-tile photo backdrop with a yellow scooter and sunflowers, set up on a hotel rooftop",
+    ("योजना", "Event planning", "from concept to execution", None, "",
      "One plan, one budget and one timeline that everyone works from."),
-    ("रचना", "Event design", "built around your vision", "blue-florals", "Ballroom ceiling hung with white flowers under blue light, around a glowing light-sculpture tree",
+    ("रचना", "Event design", "built around your vision", None, "",
      "Theme, colour, layout and mood, designed as one look."),
-    ("स्थल", "Venue selection", "the right room, the right city", "palace-stage", "Palace-facade stage built on an open lawn and lit for an evening wedding",
+    ("स्थल", "Venue selection", "the right room, the right city", None, "",
      "We shortlist, visit and negotiate, so you only see the good ones."),
-    ("समन्वय", "Vendor coordination", "one team, every vendor", "haldi-canopy", "Lilac and marigold haldi canopy with swings and potted flowers on a rooftop deck",
+    ("समन्वय", "Vendor coordination", "one team, every vendor", None, "",
      "Caterers, florists, decorators and artists, briefed and held to the plan."),
     ("सज्जा", "Décor & styling", "the atmosphere", "birthday-florals", "Ceiling of pink and peach roses above a children's birthday set",
      "Flowers, fabric, light and tablescapes that look as good in person as in photographs."),
-    ("संचालन", "On-site management", "so the day runs to plan", "box-office", "Box office and guest-list counters at the entrance of an outdoor brand event",
+    ("संचालन", "On-site management", "so the day runs to plan", None, "",
      "Our team runs the floor, the timings and the surprises."),
-    ("व्यवस्था", "Logistics", "the unglamorous part, done well", "brand-gate", "Branded entry arch with queue barriers leading into an outdoor event ground",
+    ("व्यवस्था", "Logistics", "the unglamorous part, done well", None, "",
      "Guest movement, transport, schedules and contingencies."),
     ("ध्वनि · प्रकाश", "Sound & light", "audio-visual production", "stage-haze", "Moving-head beams and low fog across a wedding stage during a performance",
      "Stage, sound, lighting and screens for performances and presentations."),
@@ -134,7 +136,7 @@ def services_rail(title_id="svc-title"):
         <p class="svc-card__hi" lang="hi">{hi}</p>
         <h3 class="svc-card__title"><span class="svc-card__num">{ROMAN[i]}</span>{t}</h3>
         <p class="svc-card__sub">({sub})</p>
-        <div class="svc-card__img">{img(im, alt, "300px")}</div>
+        {f'<div class="svc-card__img">{img(im, alt, "300px")}</div>' if im else '<div class="svc-card__img svc-card__img--empty" aria-hidden="true"></div>'}
         <p class="tiny">{d}</p>
       </article>''' for i, (hi, t, sub, im, alt, d) in enumerate(SERVICES))
     return f'''<section class="sec" aria-labelledby="{title_id}">
@@ -210,12 +212,35 @@ def quotes():
 </section>'''
 
 
+# One line-drawn landmark per city (64x64, stroked in the current colour).
+CITY_ICONS = {
+    "Kolkata": ("Howrah Bridge", '<path d="M4 44h56M18 44V18m28 26V18M15 18h6m22 0h6M18 18 4 40m14-22 14 16m14-16L32 34m14-16 14 22M18 28l-8 12m8-12 8 12m20-12-8 12m8-12 8 12"/><path d="M8 52q4-3 8 0t8 0 8 0 8 0 8 0 8 0"/>'),
+    "Guwahati": ("Kamakhya Temple", '<path d="M16 56h32M22 56V40m20 16V40M20 40h24M22 40c0-11 4-20 10-27 6 7 10 16 10 27M24.5 33h15M27 26h10M32 13V7"/><circle cx="32" cy="5.5" r="1.5"/><path d="M29 56v-6a3 3 0 0 1 6 0v6"/>'),
+    "Jaipur": ("Hawa Mahal", '<path d="M10 56V36h6v-8h6v-8h6v-8h8v8h6v8h6v8h6v20z"/><path d="M14 42v4m6-4v4m6-4v4m6-4v4m6-4v4m6-4v4m6-4v4M20 32v3m6-3v3m6-3v3m6-3v3m6-3v3M26 24v3m6-3v3m6-3v3M4 56h56"/>'),
+    "Bikaner": ("The Thar", '<path d="M12 37c0-8 6-12 12-8 2-9 10-9 12 0 4 0 8 2 10 5 2-4 2-10 4-14 2-3 6-3 8 0l-1 2-5 1c-1 5 0 11-4 17-8 3-28 3-34 1-1-1-2-2-2-4zm0 0-3 7m9-3-1 15m5-14 1 14m16-14-1 14m6-15 1 15"/><path d="M2 56q15-5 30 0t30 0"/>'),
+    "Jamshedpur": ("Steel City", '<path d="M4 56h56M6 56V40l10-6v6l10-6v6l10-6v22M42 56V20h6v36m4 0V28h4v28M45 16c-2-3 2-5 0-8m9 16c-2-3 2-5 0-8M10 46h4m6 0h4m6 0h4"/>'),
+    "Hyderabad": ("Charminar", '<path d="M14 56V30h36v26M24 56V44a8 8 0 0 1 16 0v12M10 56V14h4v42m36 0V14h4v42M10 14q2-5 4 0m36 0q2-5 4 0M12 9V6m40 3V6M9 22h6m34 0h6M14 26h36M4 56h56"/>'),
+    "Siliguri": ("Himalayan foothills", '<path d="m4 44 14-20 8 10 10-20 14 22 6-6 6 6M32 20l4-6 4 6"/><path d="M24 58c0-8 8-12 16-10-2 6-8 10-16 10zm2-1 10-7"/>'),
+    "Dubai": ("Burj Khalifa", '<path d="M32 4v8m-2 0h4v8h2v10h2v10h2v16H24V40h2V30h2V20h2zM10 56V38h8v18m28 0V32h8v24M4 56h56"/>'),
+}
+
+
 def cities_block():
-    items = "".join(f"<li>{c}</li>" for c in CITIES)
-    return f'''<section class="sec sec--tight" aria-labelledby="cities-title">
-  <div class="wrap center" data-reveal>
-    <p id="cities-title" class="eyebrow muted" style="margin-bottom:28px">[ Where we've worked ]</p>
-    <ul class="cities">{items}</ul>
+    items = "\n".join(
+        f'''      <li class="horizon__city" data-reveal style="--d:{i % 4}">
+        <svg viewBox="0 0 64 64" aria-hidden="true">{CITY_ICONS[c][1]}</svg>
+        <span class="horizon__name">{c}</span><span class="horizon__mark">{CITY_ICONS[c][0]}</span>
+      </li>''' for i, c in enumerate(CITIES))
+    return f'''<section class="sec sec--tight horizon" aria-labelledby="cities-title">
+  <div class="wrap center">
+    <div data-reveal>
+      <p class="eyebrow muted">[ Kolkata to Dubai ]</p>
+      <h2 id="cities-title" class="caps-m horizon__title">Our founder's geographic horizon</h2>
+      <p class="horizon__lead">Amit's work has taken him from the banks of the Hooghly to the Dubai skyline. In every city we have learned the venues, the vendors and the way things are done, so a celebration far from home still feels close to it.</p>
+    </div>
+    <ul class="horizon__grid">
+{items}
+    </ul>
   </div>
 </section>'''
 
@@ -239,7 +264,7 @@ def cta():
 </section>'''
 
 
-def page(slug, title, description, body, preload_poster=None, jsonld=None, noindex=False):
+def page(slug, title, description, body, preload_poster=None, jsonld=None, noindex=False, dark_hero=None):
     current = f"{slug}.html"
     canonical = f"{SITE}/" if slug == "index" else f"{SITE}/{slug}.html"
     aria = ' aria-current="page"'
@@ -255,7 +280,7 @@ def page(slug, title, description, body, preload_poster=None, jsonld=None, noind
                f'\n<link rel="preload" as="image" href="assets/img/{preload_poster}-hero-1920.webp" media="{WIDE_MQ}">'
                if preload_poster else "")
     full_title = title if slug == "index" else f"{title} | Garnet Events & Production"
-    header_cls = "site-header" if preload_poster else "site-header is-solid"
+    header_cls = "site-header" if (preload_poster if dark_hero is None else dark_hero) else "site-header is-solid"
     return f'''<!doctype html>
 <html lang="en-IN">
 <head>
@@ -363,18 +388,18 @@ def page(slug, title, description, body, preload_poster=None, jsonld=None, noind
 
 def home():
     tiles = [
-        ("weddings", "Weddings", "wedding-stage", "Wedding stage framed by florals and an LED backdrop, with a rose-petal aisle in front", True,
+        ("weddings", "Weddings", None, "", True,
          "The experience", "Ceremony and reception design, multi-day functions, and the planning that holds them together."),
-        ("corporate", "Corporate", "vip-bar", "VIP bar tents and a sponsor-branded counter at an outdoor brand event", False,
+        ("corporate", "Corporate", None, "", False,
          "", "Conferences, launches, annual days and award nights, produced like a show."),
-        ("social", "Celebrations", "birthday-florals", "Ceiling of pink and peach roses above a children's birthday set", False,
+        ("social", "Celebrations", None, "", False,
          "", "Birthdays, anniversaries and family gatherings, styled with the care of a wedding."),
-        ("destination", "Destination", "palace-stage", "Palace-facade stage built on an open lawn and lit for an evening wedding", True,
+        ("destination", "Destination", None, "", True,
          "Away from home", "Celebrations in another city, with venues, vendors and logistics sorted on the ground."),
     ]
     tile_html = "\n".join(
         f'''      <a class="tile{' tile--wide' if wide else ''}" href="services.html#{a}" data-reveal="mask" style="--d:{n % 2}">
-        {img(i, alt, "100vw" if wide else "(min-width: 900px) 50vw, 100vw", parallax=wide)}
+        {img(i, alt, "100vw" if wide else "(min-width: 900px) 50vw, 100vw", parallax=wide) if i else ""}
         <span class="tile__label"><span>{n:02d}.</span>{t}</span>
         <span class="tile__body">{f'<span class="eyebrow">{k}</span>' if k else ''}<p>{d}</p><span class="link-line">Explore {ARROW}</span></span>
       </a>''' for n, (a, t, i, alt, wide, k, d) in enumerate(tiles, 1))
@@ -576,12 +601,26 @@ def about():
                 body, preload_poster="about")
 
 
+def panel_media(name, alt):
+    """A service panel's photo, or a muted clip that plays only while it is on screen."""
+    if name.startswith("video:"):
+        clip = name.split(":", 1)[1]
+        return (f'<div class="panel__img panel__img--wide"><video muted loop playsinline preload="none" '
+                f'poster="assets/img/{clip}-poster.webp" data-inview-src="assets/videos/{clip}.mp4" '
+                f'aria-label="{escape(alt)}"></video></div>')
+    return f'<div class="panel__img">{img(name, alt, "(min-width: 900px) 42vw, 100vw")}</div>'
+
+
 def services():
     rows = [
         ("weddings", "Weddings", "Weddings &amp; functions", "wedding-stage-tall", "Wedding stage under a floral chandelier, with mirrored panels and a white aisle",
          "From one ceremony to a week of functions, we design the look, book the right people and run the schedule, so your family can be part of the day instead of managing it.",
          "We start with how you want the day to feel, then build every function around it: the mandap, the stage, the flowers, the light and the timings. One team carries it from the first site visit to the last guest leaving.",
          ["Mandap, stage and décor design", "Haldi, mehendi, sangeet and reception", "Vendor booking and coordination", "On-the-day management, start to finish"]),
+        ("prewedding", "Pre-wedding", "Pre-wedding shoots", "video:prewedding", "Couple's pre-wedding shoot at a painted haveli and around Hawa Mahal, Jaipur",
+         "A day for the two of you before the rush begins. We scout the locations, plan the looks and line up the photo and film team, so the shoot feels like an outing, not a production.",
+         "Painted havelis, old-city lanes or a quiet lawn at golden hour: we sort permissions, timings and styling so every frame is ready when the light is.",
+         ["Location scouting and permissions", "Outfits, styling and props", "Photographer and film crew", "Shoot-day schedule and travel"]),
         ("corporate", "Corporate", "Corporate events", "brand-gate", "Branded entry arch with queue barriers leading into an outdoor event ground",
          "Conferences, product launches, annual days and award nights, produced with the polish of a show and the discipline of a schedule.",
          "Our founder learned the trade on televised productions, so we think in cues, run-sheets and rehearsals. Your brand looks right on stage and your guests are looked after off it.",
@@ -600,7 +639,7 @@ def services():
         for n, (a, short, *_rest) in enumerate(rows))
     panels = "\n".join(
         f'''    <article class="panel" id="{a}" role="tabpanel" aria-labelledby="tab-{a}" tabindex="-1">
-      <div class="panel__img">{img(i, alt, "(min-width: 900px) 42vw, 100vw")}</div>
+      {panel_media(i, alt)}
       <div class="panel__body">
         <p class="script-head">{title}</p>
         <div class="panel__cols">
@@ -621,7 +660,7 @@ def services():
         f'      <div class="card card--line" data-reveal style="--d:{i}"><span class="card__num">{ROMAN[i]}</span><h3>{t}</h3><p>{d}</p></div>'
         for i, (t, d) in enumerate(steps))
     body = f'''{inner_hero("services", "Services", "What we do", "start to finish",
-        "Four kinds of events, nine services, one team. Take all of it, or only the parts you need.")}
+        "Weddings, pre-wedding shoots, corporate, social and destination events. Nine services, one team: take all of it, or only the parts you need.")}
 
 <section class="sec" aria-labelledby="types-title">
   <div class="wrap">
@@ -708,7 +747,7 @@ def contact():
     events = ["Wedding", "Corporate event", "Birthday / anniversary", "Family gathering", "Destination event", "Something else"]
     opts = "".join(f"<option>{e}</option>" for e in events)
     body = f'''{inner_hero("contact", "Contact", "Let's plan", "your celebration",
-        "Tell us the date, the city and roughly how many guests. We'll come back with ideas and a plan.")}
+        "Tell us the date, the city and roughly how many guests. We'll come back with ideas and a plan.", video=False)}
 
 <section class="sec" aria-labelledby="enquire-title">
   <div class="wrap contact">
@@ -746,7 +785,7 @@ def contact():
   </div>
 </section>'''
     return page("contact", "Contact", f"Plan your wedding, corporate event or celebration with Garnet Events & Production. Call {PHONE_DISPLAY}, WhatsApp {WA_DISPLAY} or email {EMAIL}.",
-                body, preload_poster="contact")
+                body, dark_hero=True)
 
 
 def not_found():

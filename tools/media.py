@@ -12,6 +12,7 @@ survives. Writes:
   assets/img/<page>-hero-sm.webp      portrait poster for phones
   assets/videos/<page>-hero.mp4       1920x1080 H.264, muted, for >= 900px
   assets/videos/<page>-hero-sm.mp4    720x1280 portrait crop for phones
+  assets/videos/<clip>.mp4            in-page clips (pre-wedding), 1280x720
   assets/img/og-image.jpg             1200x630 social card (photo + logo)
   tools/media.json                    sizes read by build.py
 
@@ -67,15 +68,28 @@ PHOTOS = {
 # (Wedding Swag by Rohit Thakur) and Vedas n Mantras branded decor films/photos.
 # They need the owner's permission before they go on the site.
 
-# page: (video, start seconds, focus x for the portrait phone crop)
+# page: (video, cut, focus x for the portrait phone crop)
+#   cut is a start second (an 8 s clip from there) or a list of (start, seconds[, slow])
+#   segments joined in order; slow > 1 stretches a segment into slow motion.
+#   Contact has no hero video.
 HEROES = {
-    "home": ("reels/VID_20251125_215713787.mp4", 48, .5),
+    # three entries from the Mariam & Aftab teaser: sangeet, reception stage, nikah
+    "home": ("Garnet /Mariam Teaser Photalk.mp4", [(10.75, 1.25, 1.6), (64.0, 1.45, 1.5), (76.25, 3.0)], .5),
     "about": ("Almond Amit/VID_20230510_213830.mp4", 5, .5),
     "services": (f"{NS}/IMG_6030.MOV", 92, .5),
     "gallery": ("New/VID_20231127_201022.mp4", 27, .5),
-    "contact": ("Yes/VID_20240216_211554.mp4", 88, .5),
 }
 CLIP_SECONDS = 8
+
+# In-page clips (not heroes): name: ([(path, start, seconds)], filter before scaling)
+# The pre-wedding reels were supplied separately; they are landscape film stored sideways.
+DOWNLOADS = Path.home() / "Downloads"
+CLIPS = {
+    "prewedding": ([
+        (DOWNLOADS / "SnapReels.Net_AQNlD7eFK5zLxuoH_WGFXJqZ7I0DUVXoo7DCfZUXQYzelfCiyjIW1jq_28fd8TQykLqSGMmzGlr2kSo2HtkQuSlG6ye8RP3Pspsb65U.mp4", 4.0, 6.0),
+        (DOWNLOADS / "SnapReels.Net_AQN8bpFAz35JBzIJsm_cxEEDQ_0OVdv1A1fR_nGcseMVPqNmp0VfDcruVD6_Vu-w0NPDyb8133TGE2sSUaMHHwB-KwIDDwZIawCkgtk.mp4", 3.0, 6.0),
+    ], "transpose=2"),
+}
 
 
 def run(*cmd):
@@ -131,24 +145,43 @@ def build_photo(name, spec):
     return {"w": top, "h": round(h * top / w), "widths": widths}
 
 
+def cut(segments, vf, out, crf, maxrate):
+    """Joins (path, start, seconds[, slow]) segments, applies vf and writes a muted H.264 MP4."""
+    inputs, parts, labels = [], [], ""
+    for i, (path, start, dur, *slow) in enumerate(segments):
+        inputs += ["-ss", str(start), "-t", str(dur), "-i", str(path)]
+        parts.append(f"[{i}:v]setpts={slow[0] if slow else 1}*(PTS-STARTPTS),setsar=1[s{i}]")
+        labels += f"[s{i}]"
+    graph = ";".join(parts) + f";{labels}concat=n={len(segments)}:v=1:a=0,fps=25,{vf}[out]"
+    run("ffmpeg", "-nostdin", "-v", "error", *inputs, "-filter_complex", graph, "-map", "[out]", "-an",
+        "-c:v", "libx264", "-preset", "slow", "-profile:v", "high", "-pix_fmt", "yuv420p",
+        "-crf", str(crf), "-maxrate", maxrate, "-bufsize", str(int(maxrate[:-1]) * 2) + "k",
+        "-movflags", "+faststart", "-map_metadata", "-1", "-y", str(out))
+
+
+def first_frame(out_png, mp4):
+    run("ffmpeg", "-nostdin", "-v", "error", "-i", str(mp4), "-frames:v", "1", "-y", str(out_png))
+    return Image.open(out_png).convert("RGB")
+
+
 def build_hero(page, spec):
-    video, start, fx = spec
-    src = str(SRC / video)
-    common = ["-nostdin", "-v", "error", "-ss", str(start), "-t", str(CLIP_SECONDS), "-i", src, "-an",
-              "-c:v", "libx264", "-preset", "slow", "-profile:v", "high", "-pix_fmt", "yuv420p",
-              "-movflags", "+faststart", "-map_metadata", "-1", "-r", "25"]
-    run("ffmpeg", *common, "-vf", "scale=1920:1080:flags=lanczos", "-crf", "29", "-maxrate", "1600k", "-bufsize", "3200k",
-        "-y", str(VID / f"{page}-hero.mp4"))
-    portrait = f"crop=ih*9/16:ih:(iw-ih*9/16)*{fx}:0,scale=720:1280:flags=lanczos"
-    run("ffmpeg", *common, "-vf", portrait, "-crf", "30", "-maxrate", "640k", "-bufsize", "1280k",
-        "-y", str(VID / f"{page}-hero-sm.mp4"))
+    video, when, fx = spec
+    segments = [(SRC / video, *seg) for seg in (when if isinstance(when, list) else [(when, CLIP_SECONDS)])]
+    lg, sm = VID / f"{page}-hero.mp4", VID / f"{page}-hero-sm.mp4"
+    cut(segments, "scale=-2:1080:flags=lanczos,crop=1920:1080", lg, 29, "1600k")
+    cut(segments, f"crop=ih*9/16:ih:(iw-ih*9/16)*{fx}:0,scale=720:1280:flags=lanczos", sm, 30, "640k")
     # posters (the clip's first frame) for the video element, which takes a single URL
     with tempfile.TemporaryDirectory() as tmp:
-        frame = Path(tmp) / "poster.png"
-        grab_frame(video, start, frame)
-        im = Image.open(frame).convert("RGB")
-    encode(im.resize((1920, 1080), Image.LANCZOS), IMG / f"{page}-hero-1920", avif=False)
-    encode(crop(im, "9:16", fx, .5).resize((720, 1280), Image.LANCZOS), IMG / f"{page}-hero-sm", avif=False)
+        encode(first_frame(Path(tmp) / "lg.png", lg), IMG / f"{page}-hero-1920", avif=False)
+        encode(first_frame(Path(tmp) / "sm.png", sm), IMG / f"{page}-hero-sm", avif=False)
+
+
+def build_clip(name, spec):
+    segments, pre = spec
+    out = VID / f"{name}.mp4"
+    cut(segments, f"{pre},scale=1280:720:flags=lanczos", out, 27, "1400k")
+    with tempfile.TemporaryDirectory() as tmp:
+        encode(first_frame(Path(tmp) / "p.png", out), IMG / f"{name}-poster", avif=False)
 
 
 def build_og():
@@ -178,6 +211,10 @@ def main():
         if only is None or f"{page}-hero" in only:
             build_hero(page, spec)
             print("hero", page)
+    for name, spec in CLIPS.items():
+        if only is None or name in only:
+            build_clip(name, spec)
+            print("clip", name)
     if only is None or "og" in only:
         build_og()
     manifest_path.write_text(json.dumps(dict(sorted(manifest.items())), indent=1) + "\n")
