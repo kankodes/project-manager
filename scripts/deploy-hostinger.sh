@@ -7,7 +7,9 @@
 #   HOSTINGER_FTP_PASS  - FTP password
 # Optional env vars:
 #   HOSTINGER_FTP_PORT  - defaults to 21
-#   HOSTINGER_FTP_DIR   - remote target dir, defaults to public_html
+#   HOSTINGER_FTP_DIR   - remote target dir, defaults to . (the site's FTP account
+#                         already opens inside public_html; "public_html" here
+#                         would nest the site one folder too deep)
 #
 # Usage: scripts/deploy-hostinger.sh
 
@@ -18,7 +20,7 @@ set -euo pipefail
 : "${HOSTINGER_FTP_PASS:?HOSTINGER_FTP_PASS is not set}"
 
 PORT="${HOSTINGER_FTP_PORT:-21}"
-REMOTE_DIR="${HOSTINGER_FTP_DIR:-public_html}"
+REMOTE_DIR="${HOSTINGER_FTP_DIR:-.}"
 LOCAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "Deploying $LOCAL_DIR -> $HOSTINGER_FTP_USER@$HOSTINGER_FTP_HOST:$PORT/$REMOTE_DIR"
