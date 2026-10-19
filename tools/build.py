@@ -108,19 +108,19 @@ def inner_hero(page, eyebrow, caps, script, lead, video=True):
 
 
 SERVICES = [
-    ("योजना", "Event planning", "from concept to execution", None, "",
+    ("योजना", "Event planning", "from concept to execution", "video:svc-planning", "Mehendi entrance dressed in pink and white florals",
      "One plan, one budget and one timeline that everyone works from."),
-    ("रचना", "Event design", "built around your vision", None, "",
+    ("रचना", "Event design", "built around your vision", "video:svc-design", "Feather dreamcatcher decor hung for a haldi",
      "Theme, colour, layout and mood, designed as one look."),
-    ("स्थल", "Venue selection", "the right room, the right city", None, "",
+    ("स्थल", "Venue selection", "the right room, the right city", "video:svc-venue", "Banquet hall stage lit gold with yellow florals",
      "We shortlist, visit and negotiate, so you only see the good ones."),
-    ("समन्वय", "Vendor coordination", "one team, every vendor", None, "",
+    ("समन्वय", "Vendor coordination", "one team, every vendor", "video:svc-vendors", "Mehendi artist working on a bride's hands",
      "Caterers, florists, decorators and artists, briefed and held to the plan."),
     ("सज्जा", "Décor & styling", "the atmosphere", "birthday-florals", "Ceiling of pink and peach roses above a children's birthday set",
      "Flowers, fabric, light and tablescapes that look as good in person as in photographs."),
-    ("संचालन", "On-site management", "so the day runs to plan", None, "",
+    ("संचालन", "On-site management", "so the day runs to plan", "video:svc-onsite", "Crew setting up stage screens before guests arrive",
      "Our team runs the floor, the timings and the surprises."),
-    ("व्यवस्था", "Logistics", "the unglamorous part, done well", None, "",
+    ("व्यवस्था", "Logistics", "the unglamorous part, done well", "video:svc-logistics", "Baraat moving down the road with sparklers and dancing",
      "Guest movement, transport, schedules and contingencies."),
     ("ध्वनि · प्रकाश", "Sound & light", "audio-visual production", "stage-haze", "Moving-head beams and low fog across a wedding stage during a performance",
      "Stage, sound, lighting and screens for performances and presentations."),
@@ -130,13 +130,27 @@ SERVICES = [
 CARD_TONES = ["sage", "garnet", "sage", "black"]
 
 
+def inview_video(clip, alt):
+    """A muted clip that loads and plays only while on screen (see site.js)."""
+    return (f'<video muted loop playsinline preload="none" poster="assets/img/{clip}-poster.webp" '
+            f'data-inview-src="assets/videos/{clip}.mp4" aria-label="{escape(alt)}"></video>')
+
+
+def card_media(name, alt):
+    if not name:
+        return '<div class="svc-card__img svc-card__img--empty" aria-hidden="true"></div>'
+    if name.startswith("video:"):
+        return f'<div class="svc-card__img">{inview_video(name[6:], alt)}</div>'
+    return f'<div class="svc-card__img">{img(name, alt, "300px")}</div>'
+
+
 def services_rail(title_id="svc-title"):
     cards = "\n".join(
         f'''      <article class="rail__item svc-card svc-card--{CARD_TONES[i % 4]}">
         <p class="svc-card__hi" lang="hi">{hi}</p>
         <h3 class="svc-card__title"><span class="svc-card__num">{ROMAN[i]}</span>{t}</h3>
         <p class="svc-card__sub">({sub})</p>
-        {f'<div class="svc-card__img">{img(im, alt, "300px")}</div>' if im else '<div class="svc-card__img svc-card__img--empty" aria-hidden="true"></div>'}
+        {card_media(im, alt)}
         <p class="tiny">{d}</p>
       </article>''' for i, (hi, t, sub, im, alt, d) in enumerate(SERVICES))
     return f'''<section class="sec" aria-labelledby="{title_id}">
@@ -602,18 +616,17 @@ def about():
 
 
 def panel_media(name, alt):
-    """A service panel's photo, or a muted clip that plays only while it is on screen."""
+    """A service panel's photo, or a clip (16:9 clips get a wide frame)."""
     if name.startswith("video:"):
-        clip = name.split(":", 1)[1]
-        return (f'<div class="panel__img panel__img--wide"><video muted loop playsinline preload="none" '
-                f'poster="assets/img/{clip}-poster.webp" data-inview-src="assets/videos/{clip}.mp4" '
-                f'aria-label="{escape(alt)}"></video></div>')
+        clip = name[6:]
+        wide = " panel__img--wide" if clip == "prewedding" else ""
+        return f'<div class="panel__img{wide}">{inview_video(clip, alt)}</div>'
     return f'<div class="panel__img">{img(name, alt, "(min-width: 900px) 42vw, 100vw")}</div>'
 
 
 def services():
     rows = [
-        ("weddings", "Weddings", "Weddings &amp; functions", "wedding-stage-tall", "Wedding stage under a floral chandelier, with mirrored panels and a white aisle",
+        ("weddings", "Weddings", "Weddings &amp; functions", "video:svc-weddings", "Bride entering in red in front of a golden wheel backdrop, with dancers either side",
          "From one ceremony to a week of functions, we design the look, book the right people and run the schedule, so your family can be part of the day instead of managing it.",
          "We start with how you want the day to feel, then build every function around it: the mandap, the stage, the flowers, the light and the timings. One team carries it from the first site visit to the last guest leaving.",
          ["Mandap, stage and décor design", "Haldi, mehendi, sangeet and reception", "Vendor booking and coordination", "On-the-day management, start to finish"]),
@@ -693,20 +706,9 @@ def services():
 
 
 def gallery():
-    items = [
-        ("wedding-stage", "weddings", "Wedding stage framed by florals and an LED backdrop, with a rose-petal aisle in front", "Wedding stage"),
-        ("peacock-entry", "weddings", "Bride and groom entering past giant peacock-feather installations", "Peacock entry"),
-        ("vip-bar", "corporate", "VIP bar tents and a sponsor-branded counter at an outdoor brand event", "VIP bar"),
-        ("birthday-florals", "social", "Ceiling of pink and peach roses above a children's birthday set", "Birthday florals"),
-        ("palace-stage", "destination", "Palace-facade stage built on an open lawn and lit for an evening wedding", "Palace stage"),
-        ("wedding-stage-tall", "weddings", "Wedding stage under a floral chandelier, with mirrored panels and a white aisle", "Floral chandelier"),
-        ("poolside-haldi", "social", "Haldi stage in lilac and marigold beside a rooftop pool", "Poolside haldi"),
-        ("box-office", "corporate", "Box office and guest-list counters at the entrance of an outdoor brand event", "Box office"),
-        ("stage-haze", "weddings", "Moving-head beams and low fog across a wedding stage during a performance", "Stage lighting"),
-        ("krishna-leela", "social", "Performers dressed as Radha and Krishna in front of a floral stage", "Radha Krishna act"),
-        ("brand-gate", "corporate", "Branded entry arch with queue barriers leading into an outdoor event ground", "Entry arch"),
-        ("tile-backdrop", "social", "Blue-tile photo backdrop with a yellow scooter and sunflowers, set up on a hotel rooftop", "Photo backdrop"),
-    ]
+    # (image, filter, alt, caption). Emptied at the client's request until they
+    # choose what goes here; with no items the page shows only the hero and CTA.
+    items = []
     figs = "\n".join(
         f'''      <figure class="gallery__item" data-cat="{cat}" data-reveal style="--d:{n % 3}">
         <button class="gallery__btn" type="button" aria-label="Open image: {escape(cap)}">{img(nm, alt, "(min-width: 900px) 33vw, 50vw").replace("<img ", f'<img data-full="{full_size(nm)}" ', 1)}</button>
@@ -716,10 +718,7 @@ def gallery():
     chip_html = "".join(
         f'<button class="chip" type="button" data-filter="{f}" aria-pressed="{"true" if f == "all" else "false"}"><sup>{ROMAN[i]}</sup>{l}</button>'
         for i, (f, l) in enumerate(chips))
-    body = f'''{inner_hero("gallery", "Gallery", "Selected work", "a look inside",
-        "Weddings, corporate evenings and private celebrations: the rooms, tables and moments we design.")}
-
-<section class="sec" aria-labelledby="gallery-title">
+    grid = f'''<section class="sec" aria-labelledby="gallery-title">
   <div class="wrap">
     <h2 id="gallery-title" class="visually-hidden">Gallery</h2>
     <div class="filters" role="group" aria-label="Filter by event type">{chip_html}</div>
@@ -737,7 +736,11 @@ def gallery():
     <button class="icon-btn" type="button" data-lb-next aria-label="Next image"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
   </div>
 </dialog>
+''' if items else ""
+    body = f'''{inner_hero("gallery", "Gallery", "Selected work", "a look inside",
+        "Weddings, corporate evenings and private celebrations: the rooms, tables and moments we design.")}
 
+{grid}
 {cta()}'''
     return page("gallery", "Gallery", "A look at weddings, corporate evenings and private celebrations designed by Garnet Events & Production.",
                 body, preload_poster="gallery")
@@ -747,7 +750,7 @@ def contact():
     events = ["Wedding", "Corporate event", "Birthday / anniversary", "Family gathering", "Destination event", "Something else"]
     opts = "".join(f"<option>{e}</option>" for e in events)
     body = f'''{inner_hero("contact", "Contact", "Let's plan", "your celebration",
-        "Tell us the date, the city and roughly how many guests. We'll come back with ideas and a plan.", video=False)}
+        "Tell us the date, the city and roughly how many guests. We'll come back with ideas and a plan.")}
 
 <section class="sec" aria-labelledby="enquire-title">
   <div class="wrap contact">
@@ -785,7 +788,7 @@ def contact():
   </div>
 </section>'''
     return page("contact", "Contact", f"Plan your wedding, corporate event or celebration with Garnet Events & Production. Call {PHONE_DISPLAY}, WhatsApp {WA_DISPLAY} or email {EMAIL}.",
-                body, dark_hero=True)
+                body, preload_poster="contact")
 
 
 def not_found():

@@ -20,7 +20,9 @@
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/cormorant-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css?v=6b38791bea">
+<link rel="preload" as="image" href="assets/img/contact-hero-sm.webp" media="(max-width: 899px) and (max-aspect-ratio: 1/1)">
+<link rel="preload" as="image" href="assets/img/contact-hero-1920.webp" media="(min-width: 900px), (min-aspect-ratio: 1/1)">
+<link rel="stylesheet" href="assets/css/site.css?v=fbf21952dd">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -67,8 +69,16 @@
 </div>
 
 <main id="main">
-<section class="hero hero--inner hero--plain texture" aria-labelledby="page-title">
+<section class="hero hero--inner" aria-labelledby="page-title">
+  <div class="hero__media">
+    <video muted loop playsinline preload="none" aria-hidden="true"
+      poster="assets/img/contact-hero-sm.webp"
+      data-poster-lg="assets/img/contact-hero-1920.webp"
+      data-src-sm="assets/videos/contact-hero-sm.mp4"
+      data-src-lg="assets/videos/contact-hero.mp4"></video>
+  </div>
   <div class="hero__frame" aria-hidden="true"></div>
+  <button class="media-toggle" type="button" aria-pressed="false" aria-label="Pause background video"><svg class="icon-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h3v12H4zM9 2h3v12H9z" fill="currentColor"/></svg><svg class="icon-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg></button>
   <div class="wrap hero__content">
     <div class="hero__row">
       <div>
