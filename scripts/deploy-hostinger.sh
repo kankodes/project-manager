@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Deploys the static site to Hostinger via FTP/FTPS using lftp mirror.
 #
-# Required env vars:
-#   HOSTINGER_FTP_HOST  - e.g. ftp.garnetevents.in
-#   HOSTINGER_FTP_USER  - FTP username
-#   HOSTINGER_FTP_PASS  - FTP password
-# Optional env vars:
+# Settings (env vars override the defaults):
+#   HOSTINGER_FTP_HOST  - defaults to 31.170.167.153 (hPanel > Files > FTP Accounts)
+#   HOSTINGER_FTP_USER  - defaults to u667258270.garnetevents.in
+#   HOSTINGER_FTP_PASS  - read from the macOS Keychain when not set. Store it once:
+#                         security add-generic-password -s garnet-ftp -a u667258270.garnetevents.in -w
+#                         (prompts for the password; run again with -U to update it)
 #   HOSTINGER_FTP_PORT  - defaults to 21
 #   HOSTINGER_FTP_DIR   - remote target dir, defaults to . (the site's FTP account
 #                         already opens inside public_html; "public_html" here
@@ -15,9 +16,15 @@
 
 set -euo pipefail
 
-: "${HOSTINGER_FTP_HOST:?HOSTINGER_FTP_HOST is not set}"
-: "${HOSTINGER_FTP_USER:?HOSTINGER_FTP_USER is not set}"
-: "${HOSTINGER_FTP_PASS:?HOSTINGER_FTP_PASS is not set}"
+HOSTINGER_FTP_HOST="${HOSTINGER_FTP_HOST:-31.170.167.153}"
+HOSTINGER_FTP_USER="${HOSTINGER_FTP_USER:-u667258270.garnetevents.in}"
+if [ -z "${HOSTINGER_FTP_PASS:-}" ]; then
+  HOSTINGER_FTP_PASS="$(security find-generic-password -s garnet-ftp -a "$HOSTINGER_FTP_USER" -w 2>/dev/null)" || {
+    echo "No FTP password in the Keychain. Store it once with:" >&2
+    echo "  security add-generic-password -s garnet-ftp -a $HOSTINGER_FTP_USER -w" >&2
+    exit 1
+  }
+fi
 
 PORT="${HOSTINGER_FTP_PORT:-21}"
 REMOTE_DIR="${HOSTINGER_FTP_DIR:-.}"
