@@ -114,7 +114,7 @@ SERVICES = [
      "Theme, colour, layout and mood, designed as one look."),
     ("स्थल", "Venue selection", "the right room, the right city", "video:svc-venue", "Banquet hall stage lit gold with yellow florals",
      "We shortlist, visit and negotiate, so you only see the good ones."),
-    ("समन्वय", "Vendor coordination", "one team, every vendor", "video:svc-vendors", "Tiered celebration cake on a pastel dessert table",
+    ("समन्वय", "Vendor coordination", "one team, every vendor", "video:svc-vendors", "Decor crew hanging florals and building a white gazebo at an outdoor venue",
      "Caterers, florists, decorators and artists, briefed and held to the plan."),
     ("सज्जा", "Décor & styling", "the atmosphere", "video:svc-decor", "Ballroom ceiling covered in roses, shifting from gold to pink light",
      "Flowers, fabric, light and tablescapes that look as good in person as in photographs."),

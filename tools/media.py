@@ -95,7 +95,8 @@ CLIPS = {
     "svc-planning": ([(R26 / "IMG_3829.MP4", 2.8, 3.5)], CARD, 30),      # mehendi entrance decor
     "svc-design": ([(R26 / "IMG_4195.MP4", 0.8, 3.5)], CARD, 30),        # haldi dreamcatcher decor
     "svc-venue": ([(R26 / "IMG_4540.MP4", 23.4, 3.2)], CARD, 30),        # banquet hall, yellow stage
-    "svc-vendors": ([(R26 / "IMG_2498.MP4", 5.0, 1.1, 2.7)], CARD, 30),       # tiered celebration cake
+    # crew dressing an outdoor venue (first 10 s, before the reel's caption appears)
+    "svc-vendors": ([(SRC / "reels/Decor WIP reel.MOV", 2.5, 4.0)], CARD, 30),
     "svc-decor": ([(R26 / "IMG_7853.MP4", 18.3, 2.7)], CARD_HIGH, 30),   # rose ceiling (crop stays above the name lights)
     "svc-light": ([(R26 / "IMG_4539.MP4", 10.4, 1.4, 2.2)], CARD, 30),        # stage lighting
     "svc-entertainment": ([(R26 / "IMG_4048.MP4", 1.6, 1.6, 2.0)], CARD, 30), # shadow-dance act
