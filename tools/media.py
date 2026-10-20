@@ -48,14 +48,11 @@ RV = "RAJ VILLAS EVENT"
 PHOTOS = {
     "wedding-stage-tall": (f"{NS}/FullSizeRender (2).jpeg", "4:5", .5, .55),
     "peacock-entry": (f"{NS}/IMG_6072.jpeg", "4:5", .5, .5),
-    "krishna-leela": (f"{NS}/IMG_6079.jpeg", "4:5", .5, .45),
     "stage-haze": (("frame", f"{NS}/IMG_6030.MOV", 80), None, .5, .5),
     "led-stage": (("frame", "New/VID_20231127_201022.mp4", 35), None, .5, .5),
     "palace-stage": (("frame", "reels/VID_20251125_215713787.mp4", 70), None, .5, .5),
     "brand-gate": (f"{BR}/WhatsApp Image 2024-08-31 at 7.41.38 PM (3).jpeg", None, .5, .5),
     "blue-florals": (("frame", "New/VID_20231230_211059.mp4", 12.8), "4:5", .5, .45),
-    # top of the frame only: the twins' names are spelled out in lights lower down
-    "birthday-florals": (("frame", "Garnet /Garnet 2026 Reels/IMG_7853.MP4", 19.3), "4:5", .5, 0),
     # 3:2 from the top drops the phone's date stamp
     "poolside-haldi": ("Ev/IMG-20250523-WA0026.jpg", "3:2", .5, 0),
     "haldi-canopy": ("Ev/IMG-20250523-WA0030.jpg", "3:2", .5, 0),
@@ -87,6 +84,7 @@ R26 = SRC / "Garnet /Garnet 2026 Reels"
 # below starts under that band. Left out: IMG_9377 (third-party "Varmala Decor" caption)
 # and IMG_3943 (couple's names on the baraat car). CARD = 4:5 (service cards), PANEL = 4:5 large.
 CARD = "crop=iw:iw*5/4:0:(ih-iw*5/4)*0.75,scale=480:600:flags=lanczos"
+CARD_HIGH = "crop=iw:iw*5/4:0:(ih-iw*5/4)*0.2,scale=480:600:flags=lanczos"
 PANEL = "crop=iw:iw*5/4:0:(ih-iw*5/4)*0.75,scale=864:1080:flags=lanczos"
 CLIPS = {
     # supplied separately: landscape film stored sideways
@@ -97,7 +95,10 @@ CLIPS = {
     "svc-planning": ([(R26 / "IMG_3829.MP4", 2.8, 3.5)], CARD, 30),      # mehendi entrance decor
     "svc-design": ([(R26 / "IMG_4195.MP4", 0.8, 3.5)], CARD, 30),        # haldi dreamcatcher decor
     "svc-venue": ([(R26 / "IMG_4540.MP4", 23.4, 3.2)], CARD, 30),        # banquet hall, yellow stage
-    "svc-vendors": ([(R26 / "IMG_3877.MP4", 15.5, 4.0)], CARD, 30),      # mehendi artists at work
+    "svc-vendors": ([(R26 / "IMG_2498.MP4", 5.0, 1.1, 2.7)], CARD, 30),       # tiered celebration cake
+    "svc-decor": ([(R26 / "IMG_7853.MP4", 18.3, 2.7)], CARD_HIGH, 30),   # rose ceiling (crop stays above the name lights)
+    "svc-light": ([(R26 / "IMG_4539.MP4", 10.4, 1.4, 2.2)], CARD, 30),        # stage lighting
+    "svc-entertainment": ([(R26 / "IMG_4048.MP4", 1.6, 1.6, 2.0)], CARD, 30), # shadow-dance act
     "svc-onsite": ([(R26 / "IMG_3881.MP4", 0.6, 4.0)], CARD, 30),        # last-minute stage set-up
     "svc-logistics": ([(R26 / "IMG_4322.MP4", 0.3, 4.0)], CARD, 30),     # baraat on the move, sparklers
     "svc-weddings": ([(R26 / "IMG_4326.MP4", 7.6, 5.0)], PANEL, 28),     # golden-wheel bridal entry
