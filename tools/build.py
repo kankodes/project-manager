@@ -9,6 +9,7 @@ deploy is never hidden behind a cached stylesheet.
 """
 import hashlib
 import json
+import re
 from html import escape
 from pathlib import Path
 
@@ -39,6 +40,13 @@ IMAGES["founder-amit"] = {"w": 987, "h": 1200, "widths": [800, 987], "avif": Fal
 
 def asset_version(rel):
     return hashlib.sha1((ROOT / rel).read_bytes()).hexdigest()[:10]
+
+
+def version_media(html):
+    """Tags every local image/video URL with a content hash (?v=...). Hostinger's CDN
+    caches media for 30 days, so a replaced file only shows up under a new URL."""
+    return re.sub(r'(assets/(?:img|videos)/[\w.-]+\.(?:webp|avif|jpg|png|mp4|ico))(?![\w?])',
+                  lambda m: f"{m.group(1)}?v={asset_version(m.group(1))}", html)
 
 
 CSS_V = asset_version("assets/css/site.css")
@@ -813,7 +821,7 @@ def main():
         "gallery.html": gallery(), "contact.html": contact(), "404.html": not_found(),
     }
     for name, html in pages.items():
-        (ROOT / name).write_text(html, encoding="utf-8")
+        (ROOT / name).write_text(version_media(html), encoding="utf-8")
         print("wrote", name)
     urls = "".join(
         f"  <url><loc>{SITE}/{'' if h == 'index.html' else h}</loc></url>\n" for h, _ in NAV)
